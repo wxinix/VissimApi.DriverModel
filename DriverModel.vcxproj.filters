@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="DriverModel.Intf.h" />
+    <ClInclude Include="DriverModel.Meta.hpp" />
+    <ClInclude Include="DriverModel.Logic.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DriverModel.Intf.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DriverModel.Event.hpp" />
+    <None Include="cpp.hint">
+      <Filter>Hint</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{450d3632-3bcd-46f2-b3fa-9c71868e5518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hint">
+      <UniqueIdentifier>{3873a408-82fa-4db8-8ef8-36b8a691764e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DriverModel.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

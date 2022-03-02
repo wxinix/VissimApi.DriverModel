@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+*.aps
+*.exp
+
+*.user
+
+/.int/
+/.tmp/
+/.vs/

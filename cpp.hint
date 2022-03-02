@@ -1,0 +1,6 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define DRIVERMODEL_API extern "C" __declspec(dllexport)
+#define DRIVERMODEL_API extern "C" __declspec(dllimport)
+#define meta_enum_class(Type, EnumeratorT, ...)
