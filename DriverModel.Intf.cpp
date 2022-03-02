@@ -22,17 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "DriverModel.Intf.h"
-
 #ifndef _CONSOLE
 #include <windows.h>
 #endif
 
-BOOL APIENTRY __DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+#include "DriverModel.Intf.h"
+#include "DriverModel.Event.hpp"
+#include "DriverModel.Meta.hpp"
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call) {
 
 	case DLL_PROCESS_ATTACH:
+		DriverModelEventRegistry::init_command_event_map();
+		DriverModelEventRegistry::init_data_event_map();
 		break;
 
 	case DLL_PROCESS_DETACH:
@@ -54,28 +58,63 @@ BOOL APIENTRY __DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpRese
 DRIVERMODEL_API int DriverModelSetValue(int type, int index1, int index2,
 	int int_value, double double_value, char* string_value)
 {
-	return 0;
+	auto kind = static_cast<DriverModelDataEventKind>(type);
+	DriverModelSetValueFunc set_value_func = DriverModelEventRegistry::set_value_event_map.get(kind);
+	if (set_value_func) {
+		return set_value_func(index1, index2, -1, int_value, double_value, string_value);
+	}
+	else {
+		return 0;
+	};
 }
 
 DRIVERMODEL_API int DriverModelSetValue3(int type, int index1, int index2,
 	int index3, int int_value, double double_value, char* string_value)
 {
-	return 0;
+	auto kind = static_cast<DriverModelDataEventKind>(type);
+	DriverModelSetValueFunc set_value_func = DriverModelEventRegistry::set_value_event_map.get(kind);
+	if (set_value_func) {
+		return set_value_func(index1, index2, index3, int_value, double_value, string_value);
+	}
+	else {
+		return 0;
+	};
 }
 
 DRIVERMODEL_API int DriverModelGetValue(int type, int index1, int index2,
 	int* int_value, double* double_value, char** string_value)
 {
-	return 0;
+	auto kind = static_cast<DriverModelDataEventKind>(type);
+	DriverModelGetValueFunc get_value_func = DriverModelEventRegistry::get_value_event_map.get(kind);
+	if (get_value_func) {
+		return get_value_func(index1, index2, -1, int_value, double_value, string_value);
+	}
+	else {
+		return 0;
+	};
 }
 
 DRIVERMODEL_API int DriverModelGetValue3(int type, int index1, int index2,
 	int index3, int* int_value, double* double_value, char** string_value)
 {
-	return 0;
+	auto kind = static_cast<DriverModelDataEventKind>(type);
+	DriverModelGetValueFunc get_value_func = DriverModelEventRegistry::get_value_event_map.get(kind);
+	if (get_value_func) {
+		return get_value_func(index1, index2, index3, int_value, double_value, string_value);
+	}
+	else {
+		return 0;
+	};
 }
 
 DRIVERMODEL_API  int  DriverModelExecuteCommand(int number)
 {
-	return 0;
+	auto kind = static_cast<DriverModelCommandEventKind>(number);
+	DriverModelExecuteCommandFunc command_func = DriverModelEventRegistry::command_event_map.get(kind);
+	if (command_func) {
+		return command_func();
+	}
+	else {
+		return 0;
+	};
 }

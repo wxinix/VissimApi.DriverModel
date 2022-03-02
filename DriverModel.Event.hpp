@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <functional>
 #include "DriverModel.Meta.hpp"
+#include "DriverModel.Logic.hpp"
 
 meta_enum_class(DriverModelDataEventKind, int,
      DRIVER_DATA_TIMESTEP = 102,
@@ -134,17 +135,17 @@ meta_enum_class(DriverModelDataEventKind, int,
      );
 
 meta_enum_class(DriverModelCommandEventKind, int,
-	DRIVER_COMMAND_INIT = 0,
-	DRIVER_COMMAND_CREATE_DRIVER = 1,
-	DRIVER_COMMAND_KILL_DRIVER = 2,
-	DRIVER_COMMAND_MOVE_DRIVER = 3
+    DRIVER_COMMAND_INIT = 0,
+    DRIVER_COMMAND_CREATE_DRIVER = 1,
+    DRIVER_COMMAND_KILL_DRIVER = 2,
+    DRIVER_COMMAND_MOVE_DRIVER = 3
     );
 
 using DriverModelSetValueFunc = 
     std::function<int(int, int, int, int, double, char*)>;
 
 using DriverModelGetValueFunc = 
-    std::function<int(int, int, int, int, double, char*)>;
+    std::function<int(int, int, int, int*, double*, char**)>;
 
 using DriverModelExecuteCommandFunc = 
     std::function<int()>;
@@ -152,14 +153,65 @@ using DriverModelExecuteCommandFunc =
 template<DriverModelDataEventKind kind>
 struct DriverModelDataEventSink
 {
-    static constexpr DriverModelSetValueFunc on_set_value{};
-    static constexpr DriverModelGetValueFunc on_get_value{};
+    static constexpr DriverModelSetValueFunc on_set_value;
+    static constexpr DriverModelGetValueFunc on_get_value;
 };
 
 template<DriverModelCommandEventKind kind>
 struct DriverModelCommandEventSink
 {
-    static constexpr DriverModelExecuteCommandFunc on_execute_command{};
+    static constexpr DriverModelExecuteCommandFunc on_execute_command;
+};
+
+#define ID(x) []() constexpr {return x;}
+
+struct TagSetValue {};
+struct TagGetValue {};
+struct TagCommand  {};
+
+struct DriverModelEventRegistry
+{
+    static semi::static_map<DriverModelDataEventKind, DriverModelSetValueFunc, TagSetValue> set_value_event_map;
+    static semi::static_map<DriverModelDataEventKind, DriverModelGetValueFunc, TagGetValue> get_value_event_map;
+    static semi::static_map<DriverModelCommandEventKind, DriverModelExecuteCommandFunc, TagCommand> command_event_map;
+
+    template<int N = 0>
+    static void init_data_event_map()
+    {
+        if constexpr (N < DriverModelDataEventKind_meta.members.size()) {
+            set_value_event_map.get(ID(DriverModelDataEventKind_meta.members.at(N).value)) = 
+                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_set_value;
+            
+            get_value_event_map.get(ID(DriverModelDataEventKind_meta.members.at(N).value)) = 
+                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_get_value;
+            
+            init_data_event_map<N+1>();
+        }
+    }
+    
+    template<int N = 0>
+    static void init_command_event_map()
+    {
+        if constexpr (N < DriverModelCommandEventKind_meta.members.size()) {
+            command_event_map.get(ID(DriverModelCommandEventKind_meta.members.at(N).value)) =
+                DriverModelCommandEventSink<DriverModelCommandEventKind_meta.members.at(N).value>::on_execute_command;
+			
+            init_command_event_map<N+1>();
+        }
+    }
+};
+
+template<>
+struct DriverModelDataEventSink<DriverModelDataEventKind::DRIVER_DATA_STATUS>
+{
+    static inline DriverModelSetValueFunc on_set_value = {};
+
+    static inline DriverModelGetValueFunc on_get_value = {
+        [](int index1, int index2, int index3, int* int_value, double* double_value, char** str_value) {
+            *int_value = 0;
+            return 1;
+        }
+    };
 };
 
 #endif

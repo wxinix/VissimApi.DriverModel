@@ -25,11 +25,8 @@ SOFTWARE.
 #ifndef _DRIVERMODEL_LOGIC_H
 #define _DRIVERMODEL_LOGIC_H
 
-#include "DriverModel.Meta.hpp"
-
-struct DriverModelLogic
-{
-	
-};
+/* 
+Add user-defined logic here.
+*/
 
 #endif
