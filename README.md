@@ -3,7 +3,7 @@ Modernized Vissim API Framework using C++ 20 and Meta Template Programming.
 
 Vissim's DLL-based APIs, including DriverModel API and Signal Control API, feature a C-style design where various data-tags are dispatched during runtime inside a big (and boring) switch-case structure. 
 - This certainly provides efficiency since switch-case structure will be optimized by the compiler as a jump table in machine code. 
-- Also the C-style API is very flexible, by virtue of using primitive data types only without any dependencies except system runtimes.
+- Also the C-style API is very flexible, by virtue of using primitive data types without any dependencies except system runtimes.
 
 Howerver, there are some nuances with C-style design:
 
@@ -12,7 +12,7 @@ Howerver, there are some nuances with C-style design:
    
 The framework herein provides a different design and implementation - modular, structured, while still computationally efficient, thanks to the modern C++ and its meta template programming. Specifically, this framework features:
 
-- *Seperaton of Concerns* 
+- *Seperation of Concerns* 
   - **Interface**. This part is for interfacing with the Vissim simulator host. it includes the DLL export functions with boiler-plate implementation that a user probably would never need to touch.  
   - **Logic**. This is where the user implements customized driver behavior logic. It is separated from the rest of the framework. A dispatched event will end up somewhere here.
   - **Event**. This part of code is where a **compile-time** static hash gets constructed. This compile-time hash allows us to get rid of the boring switch-case structure, dispatching tagged data types more inteligently.  Again, the hash is a **compile-time** structure, with almost zero extra overhead compared to the use of switch-case structure. Importantly, this new dispatching mechnism helps writing structured, scalable, and maintainable code.
