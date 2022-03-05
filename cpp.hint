@@ -4,3 +4,5 @@
 #define DRIVERMODEL_API extern "C" __declspec(dllexport)
 #define DRIVERMODEL_API extern "C" __declspec(dllimport)
 #define meta_enum_class(Type, EnumeratorT, ...)
+#define semi_branch_expect(x, y) __builtin_expect(x, y)
+#define semi_branch_expect(x, y)
