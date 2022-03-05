@@ -429,8 +429,7 @@ namespace semi {
         constexpr std::size_t constexpr_strlen(const char* str) { return str[0] == 0 ? 0 : constexpr_strlen(str + 1) + 1; }
 
         template <auto...>
-        struct dummy_t {
-        };
+        struct dummy_t {};
         
         template <typename Identifier, std::enable_if_t<std::is_integral_v<identifier_type<Identifier>>, int> = 0>
         constexpr auto idval2type(Identifier id)
@@ -458,19 +457,21 @@ namespace semi {
         }
 
         template <typename, typename, bool>
-        struct default_tag {
-        };
+        struct default_tag {};
 
         // super simple flat map implementation
         template <typename Key, typename Value>
-        class flat_map {
+        class flat_map 
+        {
         public:
             template <typename... Args>
             Value& get(const Key& key, Args&&... args)
             {
-                for (auto& pair : storage)
-                    if (pair.first == key)
+                for (auto& pair : storage) {
+                    if (pair.first == key) {
                         return pair.second;
+                    }
+                }
 
                 return storage.emplace_back(key, Value(std::forward<Args>(args)...)).second;
             }
@@ -492,9 +493,11 @@ namespace semi {
 
             bool contains(const Key& key) const
             {
-                for (auto& pair : storage)
-                    if (pair.first == key)
+                for (auto& pair : storage) {
+                    if (pair.first == key) {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -525,7 +528,8 @@ namespace semi {
     class map;
 
     template <typename Key, typename Value, typename Tag = detail::default_tag<Key, Value, true>>
-    class static_map {
+    class static_map 
+    {
     public:
         static_map() = delete;
 
@@ -543,10 +547,12 @@ namespace semi {
 
                 auto it = runtime_map.find(key);
 
-                if (it != runtime_map.end())
+                if (it != runtime_map.end()) {
                     it->second = u_ptr(new (mem) Value(std::move(*it->second)), { &i_flag });
-                else
+                }
+                else {
                     runtime_map.emplace_hint(it, key, u_ptr(new (mem) Value(std::forward<Args>(args)...), { &i_flag }));
+                }
 
                 i_flag = true;
             }
@@ -559,8 +565,9 @@ namespace semi {
         {
             auto it = runtime_map.find(key);
 
-            if (it != runtime_map.end())
+            if (it != runtime_map.end()) {
                 return *it->second;
+            }
 
             return *runtime_map.emplace_hint(it, key, u_ptr(new Value(std::forward<Args>(args)...), { nullptr }))->second;
         }
@@ -639,7 +646,8 @@ namespace semi {
     bool static_map<Key, Value, Tag>::init_flag = false;
 
     template <typename Key, typename Value, typename Tag = detail::default_tag<Key, Value, false>>
-    class map {
+    class map 
+    {
     public:
         ~map()
         {
@@ -655,8 +663,9 @@ namespace semi {
         template <typename Identifier>
         bool contains(Identifier key)
         {
-            if (staticmap::contains(key))
+            if (staticmap::contains(key)) {
                 return staticmap::get(key).contains(this);
+            }
 
             return false;
         }
@@ -668,8 +677,9 @@ namespace semi {
                 auto& map = staticmap::get(key);
                 map.erase(this);
 
-                if (map.size() == 0)
+                if (map.size() == 0) {
                     staticmap::erase(key);
+                }
             }
         }
 
