@@ -1,7 +1,7 @@
 # VissimApi.DriverModel
 All of Vissim's DLL-based APIs, including DriverModel and Signal Control APIs - feature a uniform C-style design, where various data-tags are dispatched during runtime using switch-case statements.
 
-- In a nutshell, Vissim's C-style APIs provide a very flexible mechnism for user-defined driver-behavior or signal congrol logics. They only use primitive data types in the interface declaration, hence not requring any external dependencies.
+- In a nutshell, Vissim's C-style APIs provide a very flexible mechanism for user-defined driver-behavior or signal control logics. They only use primitive data types in the interface declaration, hence not requiring any external dependencies.
 - Vissim's C-style APIs may also provide some efficiency when switch-case statements can be optimized by the compiler as a jump table. However, that is not always the case, and switch-case statements can be slow during simulation runtime, especially when the number of cases is large (e.g., greater than 7) (see Ref [1] and [2]).
 
 From the software engineering perspective, there are some nuances with Vissim's C-style design as well:
@@ -11,14 +11,14 @@ From the software engineering perspective, there are some nuances with Vissim's 
    
 The framework herein provides a different design and implementation in modern C++ - modular, structured, while still computationally efficient (actually, faster). Specifically, this framework features:
 
-- *Seperation of Concerns* 
-  - **DriverModel.Intf**. This part is for communicating with the Vissim simulator. It includes the DLL export functions with minimal boiler-plate implementation. This part of code is not suppoed to be changed by the user.
-  - **DriverModel.UserModel** and **DriverModel.UserEvent**. A user should implement her own logic through the User Model unit.
-    - DriverModel.UserModel is where the user implements her customized driver behavior logic. It is separated from the rest of the framework. 
-    - DriverModel.UserEvent is where the events are "wired" to the user model.
+- *Separation of Concerns* 
+  - **DriverModel.Intf** responsible for communicating with the Vissim simulator. It includes DLL export functions with minimal boiler-plate code. This part of code is not supposed to be changed by the user.
+  - **DriverModel.UserModel** and **DriverModel.UserEvent**. A user should implement her own logic through DriverModel.UserModel unit.
+    - **DriverModel.UserModel** is where the user implements her customized driver behavior logic. It is separated from the rest of the framework. 
+    - **DriverModel.UserEvent** is where events are "wired" to the user model. In rare situation, a user can customize the code here but it is part of the framework that is not supposed to be changed by the user.
   - **DriverModel.Event**. This is where a **compile-time** look-up array gets constructed. This part of code is not supposed to be changed by the user.
-    - This allows us to get rid of those boring (and slower) switch-case statements, while dispatching tagged data types more efficiently using direct array-based function pointer addresing. 
-    - Importantly, this new dispatching mechnism fascilitates writing structured, scalable, and maintainable code for sophisticated user-deinfed logic. 
+    - The new event-dispatching mechanism totally gets rid of those boring (and slower) switch-case statements, using direct array-based function pointer addressing. 
+    - Importantly, this new mechanism facilitates writing structured, scalable, and maintainable code for sophisticated user-defined logic. 
   - **DriverModel.Meta**. Low-level C++ meta enum helper class. Somewhat complex but worthwhile and fun to explore. This part of code is not supposed to be changed by the user.
   
 - *Open for extension, close for modification*
@@ -39,7 +39,7 @@ To be added.
 To be added.
 
 # Compiler
-The code requries a C++ compiler that supports C++/17 or above. The latest MSVC compiler recommended. 
+C++ compiler that supports C++/17 or above. The latest MSVC compiler recommended. 
 
 # Platform
 Windows only. But you can customize the interface part of the code to make it work on Linux since this framework uses standard C++ only.
