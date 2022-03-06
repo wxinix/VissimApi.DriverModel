@@ -1,45 +1,51 @@
 # VissimApi.DriverModel
-Modernized Vissim API Framework using modern C++ and Template Meta-programming.
+All of Vissim's DLL-based APIs, including DriverModel and Signal Control APIs - feature a uniform C-style design, where various data-tags are dispatched during runtime using switch-case statements.
 
-Vissim's DLL-based APIs, including DriverModel API and Signal Control API, feature a C-style design where various data-tags are dispatched during runtime inside a big (and boring) switch-case structure. 
-- This certainly provides some efficiency since switch-case structure can be optimized by the compiler as a jump table. However, just be aware that switch statement is not always efficient, especially when the number of cases is large (e.g., greater than 7) (see Ref [1] and [2]), compared to array based addressing.
-- The C-style API is flexible, by virtue of using primitive data types without any dependencies except system runtimes. 
+- In a nutshell, Vissim's C-style APIs provide a very flexible mechnism for user-defined driver-behavior or signal congrol logics. They only use primitive data types in the interface declaration, hence not requring any external dependencies.
+- Vissim's C-style APIs may also provide some efficiency when switch-case statements can be optimized by the compiler as a jump table. However, that is not always the case, and switch-case statements can be slow during simulation runtime, especially when the number of cases is large (e.g., greater than 7) (see Ref [1] and [2]).
 
-There are some nuances with C-style design:
+From the software engineering perspective, there are some nuances with Vissim's C-style design as well:
 
-- User code may end up spaghetti-like, mixing boiler-plate interface code with the code that implements the core driver behavior logic.
-- User code may ultimately become hard to extend and maintain. The big switch-case structure has to be re-visited again and again for editing, adding, or modifying - clearly a violation of SOLID rule, i.e., *"open for extension, closed for modification"*. 
+- User code may end up spaghetti-like, mixing boiler-plate interface code with the code that implements the user-defined driver behavior logic.
+- User code may ultimately become hard to extend and maintain. The big switch-case structure has to be re-visited again and again for editing, adding, or modifying - an apparent violation of the SOLID principle, i.e., *"open for extension, closed for modification"*. 
    
-The framework herein provides a different design and implementation - modular, structured, while still computationally efficient, thanks to the modern C++ and its meta template programming. Specifically, this framework features:
+The framework herein provides a different design and implementation in modern C++ - modular, structured, while still computationally efficient (actually, faster). Specifically, this framework features:
 
 - *Seperation of Concerns* 
-  - **Interface**. This part is for interfacing with the Vissim simulator host. it includes the DLL export functions with boiler-plate implementation that a user probably would never need to touch.  
-  - **Logic**. This is where the user implements customized driver behavior logic. It is separated from the rest of the framework. A dispatched event will end up somewhere here.
-  - **Event**. This part of code is where a **compile-time** static hash gets constructed. This compile-time hash allows us to get rid of the boring switch-case structure, dispatching tagged data types more inteligently.  Again, the hash is a **compile-time** structure, with almost zero extra overhead compared to the use of switch-case structure. Importantly, this new dispatching mechnism helps writing structured, scalable, and maintainable code.
-  - **Meta Classes**. These are the low-level C++ template classes facilitating the framework. They are fairly complex but worthwhile to delve into them if you are interested.
+  - **DriverModel.Intf**. This part is for communicating with the Vissim simulator. It includes the DLL export functions with minimal boiler-plate implementation. This part of code is not suppoed to be changed by the user.
+  - **DriverModel.UserModel** and **DriverModel.UserEvent**. A user should implement her own logic through the User Model unit.
+    - DriverModel.UserModel is where the user implements her customized driver behavior logic. It is separated from the rest of the framework. 
+    - DriverModel.UserEvent is where the events are "wired" to the user model.
+  - **DriverModel.Event**. This is where a **compile-time** look-up array gets constructed. This part of code is not supposed to be changed by the user.
+    - This allows us to get rid of those boring (and slower) switch-case statements, while dispatching tagged data types more efficiently using direct array-based function pointer addresing. 
+    - Importantly, this new dispatching mechnism fascilitates writing structured, scalable, and maintainable code for sophisticated user-deinfed logic. 
+  - **DriverModel.Meta**. Low-level C++ meta enum helper class. Somewhat complex but worthwhile and fun to explore. This part of code is not supposed to be changed by the user.
   
 - *Open for extension, close for modification*
-  - The boring switch-case structure is replaced by a compile-time hash-table, with *almost* no additional performance overhead. The hash is constructed during compile time, and is optimized because both the keys (i.e., the event types) and values (i.e., the event callbacks) are known at compile time thus can have static storages. This makes the key-value retrieval during runtime *almost* as fast as accessing global variable.
-  - Template specialization enables auto-registration of events during compile time, transparently without involing user code
+  - Those boring and slower switch-case statements are replaced by an array of function pointers automatically constructed at compile time, which leads to faster event dispatching than the original switch statements. 
+  - Template specialization enables auto-registration of events during compile time.
  
  - *Single Responsibility*
-   - User logic is cleanly isolated, and can be extended and maintained easily in a much cleaner way.
+   - User logic and user events are isolated, and can be extended and maintained easily in a much cleaner way.
 
 
 # Usage
-Details to be added.
+To be added.
 
 # Example
 To be added.
 
+# Benchmark
+To be added.
+
 # Compiler
-The code requries a C++ compiler that supports C++/20. The latest MSVC compiler recommended. 
+The code requries a C++ compiler that supports C++/17 or above. The latest MSVC compiler recommended. 
 
 # Platform
 Windows only. But you can customize the interface part of the code to make it work on Linux since this framework uses standard C++ only.
 
 # Acknowledgement
-This framework partly uses meta_enum ([Tobias Widlund](https://github.com/therocode/meta_enum)) and semi-map ([Fabian Renn-Giles](https://github.com/hogliux/semimap)). They are customized for this VissimApi.DriverModel framework. Special thanks to Tobias Widlund and Fabian Renn-Giles, for their contributions to the C++ community. 
+This framework partly uses [meta_enum](https://github.com/therocode/meta_enum) originally developed by Tobias Widlund. 
 
 # References
 1. ["Is Code Faster Than Data? Switch Statements vs. Arrays".](https://blog.demofox.org/2016/09/26/is-code-faster-than-data-switch-statements-vs-arrays/)
