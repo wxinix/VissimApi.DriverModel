@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <functional>
 #include "DriverModel.Meta.hpp"
-#include "DriverModel.UserLogic.hpp"
 
 meta_enum_class(DriverModelDataEventKind, int,
      DRIVER_DATA_TIMESTEP = 102,

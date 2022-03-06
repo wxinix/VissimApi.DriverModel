@@ -255,7 +255,7 @@
   <ItemGroup>
     <ClInclude Include="DriverModel.Intf.h" />
     <ClInclude Include="DriverModel.Meta.hpp" />
-    <ClInclude Include="DriverModel.UserLogic.hpp" />
+    <ClInclude Include="DriverModel.UserModel.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
