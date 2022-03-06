@@ -255,11 +255,12 @@
   <ItemGroup>
     <ClInclude Include="DriverModel.Intf.h" />
     <ClInclude Include="DriverModel.Meta.hpp" />
-    <ClInclude Include="DriverModel.Logic.hpp" />
+    <ClInclude Include="DriverModel.UserLogic.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
     <None Include="DriverModel.Event.hpp" />
+    <None Include="DriverModel.UserEvent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DriverModel.rc" />

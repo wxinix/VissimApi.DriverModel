@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <functional>
 #include "DriverModel.Meta.hpp"
-#include "DriverModel.Logic.hpp"
+#include "DriverModel.UserLogic.hpp"
 
 meta_enum_class(DriverModelDataEventKind, int,
      DRIVER_DATA_TIMESTEP = 102,
@@ -141,49 +141,40 @@ meta_enum_class(DriverModelCommandEventKind, int,
     DRIVER_COMMAND_MOVE_DRIVER = 3
     );
 
-using DriverModelSetValueFunc = 
-    std::function<int(int, int, int, int, double, char*)>;
-
-using DriverModelGetValueFunc = 
-    std::function<int(int, int, int, int*, double*, char**)>;
-
-using DriverModelExecuteCommandFunc = 
-    std::function<int()>;
+typedef int (*DriverModelSetValFunc)(int, int, int, int,  double,  char*);
+typedef int (*DriverModelGetValFunc)(int, int, int, int*, double*, char**);
+typedef int (*DriverModelExeCmdFunc)();
 
 template<DriverModelDataEventKind kind>
 struct DriverModelDataEventSink
 {
-    static constexpr DriverModelSetValueFunc on_set_value;
-    static constexpr DriverModelGetValueFunc on_get_value;
+    static constexpr DriverModelSetValFunc on_setval { nullptr };
+    static constexpr DriverModelGetValFunc on_getval { nullptr };
 };
 
 template<DriverModelCommandEventKind kind>
 struct DriverModelCommandEventSink
 {
-    static constexpr DriverModelExecuteCommandFunc on_execute_command;
+    static constexpr DriverModelExeCmdFunc on_execmd { nullptr };
 };
-
-#define ID(x) []() constexpr {return x;}
-
-struct TagSetValue {};
-struct TagGetValue {};
-struct TagCommand  {};
 
 struct DriverModelEventRegistry
 {
-    static semi::static_map<DriverModelDataEventKind, DriverModelSetValueFunc, TagSetValue> set_value_event_map;
-    static semi::static_map<DriverModelDataEventKind, DriverModelGetValueFunc, TagGetValue> get_value_event_map;
-    static semi::static_map<DriverModelCommandEventKind, DriverModelExecuteCommandFunc, TagCommand> command_event_map;
+    static constexpr size_t capacity{ 1024 }; // 1024 function pointers, for better cache line alignment.
+
+    static std::array<DriverModelSetValFunc, DriverModelEventRegistry::capacity> setval_event_map;
+    static std::array<DriverModelGetValFunc, DriverModelEventRegistry::capacity> getval_event_map;
+    static std::array<DriverModelExeCmdFunc, DriverModelEventRegistry::capacity> execmd_event_map;
 
     template<int N = 0>
     static void init_data_event_map()
     {
         if constexpr (N < DriverModelDataEventKind_meta.members.size()) {
-            set_value_event_map.get(ID(DriverModelDataEventKind_meta.members.at(N).value)) = 
-                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_set_value;
+            setval_event_map[static_cast<int>(DriverModelDataEventKind_meta.members.at(N).value)] =
+                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_setval;
             
-            get_value_event_map.get(ID(DriverModelDataEventKind_meta.members.at(N).value)) = 
-                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_get_value;
+            getval_event_map[static_cast<int>(DriverModelDataEventKind_meta.members.at(N).value)] =
+                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_getval;
             
             init_data_event_map<N+1>();
         }
@@ -193,26 +184,19 @@ struct DriverModelEventRegistry
     static void init_command_event_map()
     {
         if constexpr (N < DriverModelCommandEventKind_meta.members.size()) {
-            command_event_map.get(ID(DriverModelCommandEventKind_meta.members.at(N).value)) =
-                DriverModelCommandEventSink<DriverModelCommandEventKind_meta.members.at(N).value>::on_execute_command;
+            execmd_event_map[static_cast<int>(DriverModelCommandEventKind_meta.members.at(N).value)] =
+                DriverModelCommandEventSink<DriverModelCommandEventKind_meta.members.at(N).value>::on_execmd;
 			
             init_command_event_map<N+1>();
         }
     }
 };
 
-template<>
-struct DriverModelDataEventSink<DriverModelDataEventKind::DRIVER_DATA_STATUS>
-{
-    static inline DriverModelSetValueFunc on_set_value = {};
+std::array<DriverModelSetValFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::setval_event_map{};
+std::array<DriverModelGetValFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::getval_event_map{};
+std::array<DriverModelExeCmdFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::execmd_event_map{};
 
-    static inline DriverModelGetValueFunc on_get_value = {
-        [](int index1, int index2, int index3, int* int_value, double* double_value, char** str_value) {
-            *int_value = 0;
-            return 1;
-        }
-    };
-};
+#include "DriverModel.UserEvent.hpp"
 
 #endif
 
