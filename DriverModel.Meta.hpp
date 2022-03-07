@@ -326,4 +326,3 @@ namespace meta_enum_internal {
     }
 
 #endif
-

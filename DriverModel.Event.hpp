@@ -25,10 +25,12 @@ SOFTWARE.
 #ifndef _DRIVERMODEL_EVENT_H
 #define _DRIVERMODEL_EVENT_H
 
-#include <functional>
+#include <concepts>
+#include <memory>
+#include "DriverModel.Base.hpp"
 #include "DriverModel.Meta.hpp"
 
-meta_enum_class(DriverModelDataEventKind, int,
+meta_enum_class(DriverModelDataKind, int,
      DRIVER_DATA_TIMESTEP = 102,
      DRIVER_DATA_TIME = 103,
      DRIVER_DATA_PARAMETERFILE = 104,
@@ -133,67 +135,137 @@ meta_enum_class(DriverModelDataEventKind, int,
      DRIVER_DATA_ALLOW_MULTITHREADING = 811
      );
 
-meta_enum_class(DriverModelCommandEventKind, int,
+meta_enum_class(DriverModelCommandKind, int,
     DRIVER_COMMAND_INIT = 0,
     DRIVER_COMMAND_CREATE_DRIVER = 1,
     DRIVER_COMMAND_KILL_DRIVER = 2,
     DRIVER_COMMAND_MOVE_DRIVER = 3
     );
 
-typedef int (*DriverModelSetValFunc)(int, int, int, int,  double,  char*);
-typedef int (*DriverModelGetValFunc)(int, int, int, int*, double*, char**);
-typedef int (*DriverModelExeCmdFunc)();
-
-template<DriverModelDataEventKind kind>
-struct DriverModelDataEventSink
+struct DriverModelFunctor
 {
-    static constexpr DriverModelSetValFunc on_setval { nullptr };
-    static constexpr DriverModelGetValFunc on_getval { nullptr };
+    using type = DriverModelFunctor;
+public:
+    void set_model(std::shared_ptr<DriverModel> a_model) {
+        m_driver_model = a_model;
+    };
+
+    std::shared_ptr<DriverModel> driver_model() {
+        return m_driver_model;
+    };
+private:
+    std::shared_ptr<DriverModel> m_driver_model {nullptr};
 };
 
-template<DriverModelCommandEventKind kind>
-struct DriverModelCommandEventSink
+struct DriverModelGetValueFunctor : public DriverModelFunctor
 {
-    static constexpr DriverModelExeCmdFunc on_execmd { nullptr };
+    virtual int operator()(int index1, int index2, int index3, int* int_value, double* double_value, char** string_value) {
+        return 0;
+    }
 };
+
+struct DriverModelSetValueFunctor : public DriverModelFunctor
+{
+    virtual int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) {
+        return 0;
+    }
+};
+
+struct DriverModelCommandFunctor : public DriverModelFunctor
+{
+    virtual int operator()() {
+        return 1;
+    }
+};
+
+template<DriverModelDataKind kind>
+struct DriverModelGetValueEventHandler : DriverModelGetValueFunctor 
+{};
+
+template<DriverModelDataKind kind>
+struct DriverModelSetValueEventHandler : DriverModelSetValueFunctor
+{};
+
+template<DriverModelCommandKind kind>
+struct DriverModelCommandEventHandler : DriverModelCommandFunctor
+{};
 
 struct DriverModelEventRegistry
 {
-    static constexpr size_t capacity{ 1024 }; // 1024 function pointers, for better cache line alignment.
+    using SetValueFuncArray = 
+        std::array<std::unique_ptr<DriverModelSetValueFunctor>, 1024>;
+    
+    using GetValueFuncArray = 
+        std::array<std::unique_ptr<DriverModelGetValueFunctor>, 1024>;
+    
+    using CommandFuncArray = 
+        std::array<std::unique_ptr<DriverModelCommandFunctor>, 8>;
 
-    static std::array<DriverModelSetValFunc, DriverModelEventRegistry::capacity> setval_event_map;
-    static std::array<DriverModelGetValFunc, DriverModelEventRegistry::capacity> getval_event_map;
-    static std::array<DriverModelExeCmdFunc, DriverModelEventRegistry::capacity> execmd_event_map;
+    static void init() {
+        init_set_value_func_array<0, DriverModelDataKind_meta.members.size()>();
+        init_get_value_func_array<0, DriverModelDataKind_meta.members.size()>();
+        init_command_func_array<0, DriverModelCommandKind_meta.members.size()>();
+    }
 
-    template<int N = 0>
-    static void init_data_event_map()
+    static void set_model(std::shared_ptr<DriverModel> a_model)
     {
-        if constexpr (N < DriverModelDataEventKind_meta.members.size()) {
-            setval_event_map[static_cast<int>(DriverModelDataEventKind_meta.members.at(N).value)] =
-                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_setval;
-            
-            getval_event_map[static_cast<int>(DriverModelDataEventKind_meta.members.at(N).value)] =
-                DriverModelDataEventSink<DriverModelDataEventKind_meta.members.at(N).value>::on_getval;
-            
-            init_data_event_map<N+1>();
+        for (int i = 0; i < set_value_func_array.size(); i++) {
+            if (set_value_func_array[i]) {
+                set_value_func_array[i]->set_model(a_model);
+            }
+        }
+
+        for (int i = 0; i < get_value_func_array.size(); i++) {
+            if (get_value_func_array[i]) {
+                get_value_func_array[i]->set_model(a_model);
+            }
+        }
+
+        for (int i = 0; i < command_func_array.size(); i++) {
+            if (command_func_array[i]) {
+                command_func_array[i]->set_model(a_model);
+            }
         }
     }
-    
-    template<int N = 0>
-    static void init_command_event_map()
+       
+    static SetValueFuncArray set_value_func_array;
+    static GetValueFuncArray get_value_func_array;
+    static CommandFuncArray  command_func_array;
+private:
+    template<int I, int N>
+    static void init_set_value_func_array()
     {
-        if constexpr (N < DriverModelCommandEventKind_meta.members.size()) {
-            execmd_event_map[static_cast<int>(DriverModelCommandEventKind_meta.members.at(N).value)] =
-                DriverModelCommandEventSink<DriverModelCommandEventKind_meta.members.at(N).value>::on_execmd;
-			
-            init_command_event_map<N+1>();
+        if constexpr (I < N) {
+            set_value_func_array[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelSetValueEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
+            init_set_value_func_array<I+1, N>();
+        }
+    }
+
+    template<int I, int N>
+    static void init_get_value_func_array()
+    {
+        if constexpr (I < N) {
+            get_value_func_array[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelGetValueEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
+            init_get_value_func_array<I+1, N>();
+        }
+    }
+
+    template<int I, int N>
+    static void init_command_func_array()
+    {
+        if constexpr (I < N) {
+            command_func_array[static_cast<int>(DriverModelCommandKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelCommandEventHandler<DriverModelCommandKind_meta.members.at(I).value>>();
+            init_command_func_array<I+1, N>();
         }
     }
 };
 
-std::array<DriverModelSetValFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::setval_event_map{};
-std::array<DriverModelGetValFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::getval_event_map{};
-std::array<DriverModelExeCmdFunc, DriverModelEventRegistry::capacity> DriverModelEventRegistry::execmd_event_map{};
+DriverModelEventRegistry::SetValueFuncArray DriverModelEventRegistry::set_value_func_array;
+DriverModelEventRegistry::GetValueFuncArray DriverModelEventRegistry::get_value_func_array;
+DriverModelEventRegistry::CommandFuncArray  DriverModelEventRegistry::command_func_array;
 
 #include "DriverModel.UserEvent.hpp"
 

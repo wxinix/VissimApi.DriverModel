@@ -3,6 +3,8 @@
   <ItemGroup>
     <ClInclude Include="DriverModel.Intf.h" />
     <ClInclude Include="DriverModel.Meta.hpp" />
+    <ClInclude Include="DriverModel.Base.hpp" />
+    <ClInclude Include="DriverModel.UserEvent.hpp" />
     <ClInclude Include="DriverModel.UserModel.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -13,7 +15,6 @@
     <None Include="cpp.hint">
       <Filter>Hint</Filter>
     </None>
-    <None Include="DriverModel.UserEvent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource">
