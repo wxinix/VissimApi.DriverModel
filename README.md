@@ -12,13 +12,11 @@ From the software engineering perspective, there are some nuances with Vissim's 
 The framework herein provides a different design and implementation in modern C++ - modular, structured, while still computationally efficient (actually, faster). Specifically, this framework features:
 
 - *Separation of Concerns* 
-  - **DriverModel.Intf** responsible for communicating with the Vissim simulator. It includes DLL export functions with minimal boiler-plate code. This part of code is not supposed to be changed by the user.
-  - **DriverModel.UserModel** and **DriverModel.UserEvent**. A user should implement her own logic through DriverModel.UserModel unit.
-    - **DriverModel.UserModel** is where the user implements her customized driver behavior logic. It is separated from the rest of the framework. 
-    - **DriverModel.UserEvent** is where events are "wired" to the user model. In rare situation, a user can customize the code here but it is part of the framework that is not supposed to be changed by the user.
-  - **DriverModel.Event**. This is where a **compile-time** look-up array gets constructed. This part of code is not supposed to be changed by the user.
-    - The new event-dispatching mechanism totally gets rid of those boring (and slower) switch-case statements, using direct array-based function pointer addressing. 
-    - Importantly, this new mechanism facilitates writing structured, scalable, and maintainable code for sophisticated user-defined logic. 
+  - **DriverModel.Intf** is responsible for communicating with the Vissim simulator. It includes DLL export functions with minimal boiler-plate code. This part of code is not supposed to be changed by the user.
+  - **DriverModel.UserModel** is where the user implements customized driver behavior logic. The user should implement the DriverModelFactory accordingly.
+  - **DriverModel.Event** is a type of "glue" code, responsible for "wiring-up" various driver model events. The user is not supposed to change the code in this part.
+    - The new event-dispatching mechanism no longer uses "boring" (and slower) switch-case statements. The mechanism now dispatches events to proper event handlers using a faster static table of function pointers.
+    - More important, this new mechanism facilitates writing structured, scalable, and maintainable code for sophisticated user-defined logic, thanks to that events are now completely decoupled from user logic.
   - **DriverModel.Meta**. Low-level C++ meta enum helper class. Somewhat complex but worthwhile and fun to explore. This part of code is not supposed to be changed by the user.
   
 - *Open for extension, close for modification*
