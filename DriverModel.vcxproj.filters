@@ -4,7 +4,6 @@
     <ClInclude Include="DriverModel.Intf.h" />
     <ClInclude Include="DriverModel.Meta.hpp" />
     <ClInclude Include="DriverModel.Base.hpp" />
-    <ClInclude Include="DriverModel.UserEvent.hpp" />
     <ClInclude Include="DriverModel.UserModel.hpp" />
   </ItemGroup>
   <ItemGroup>

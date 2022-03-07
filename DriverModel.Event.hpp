@@ -133,18 +133,17 @@ meta_enum_class(DriverModelDataKind, int,
      DRIVER_DATA_USE_INTERNAL_MODEL = 807,
      DRIVER_DATA_WANTS_ALL_NVEHS = 810,
      DRIVER_DATA_ALLOW_MULTITHREADING = 811
-     );
+ );
 
 meta_enum_class(DriverModelCommandKind, int,
     DRIVER_COMMAND_INIT = 0,
     DRIVER_COMMAND_CREATE_DRIVER = 1,
     DRIVER_COMMAND_KILL_DRIVER = 2,
     DRIVER_COMMAND_MOVE_DRIVER = 3
-    );
+);
 
 struct DriverModelFunctor
 {
-    using type = DriverModelFunctor;
 public:
     void set_model(std::shared_ptr<DriverModel> a_model) {
         m_driver_model = a_model;
@@ -157,21 +156,21 @@ private:
     std::shared_ptr<DriverModel> m_driver_model {nullptr};
 };
 
-struct DriverModelGetValueFunctor : public DriverModelFunctor
+struct DriverModelGetvalFunctor : public DriverModelFunctor
 {
     virtual int operator()(int index1, int index2, int index3, int* int_value, double* double_value, char** string_value) {
         return 0;
     }
 };
 
-struct DriverModelSetValueFunctor : public DriverModelFunctor
+struct DriverModelSetvalFunctor : public DriverModelFunctor
 {
     virtual int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) {
         return 0;
     }
 };
 
-struct DriverModelCommandFunctor : public DriverModelFunctor
+struct DriverModelRuncmdFunctor : public DriverModelFunctor
 {
     virtual int operator()() {
         return 1;
@@ -179,95 +178,128 @@ struct DriverModelCommandFunctor : public DriverModelFunctor
 };
 
 template<DriverModelDataKind kind>
-struct DriverModelGetValueEventHandler : DriverModelGetValueFunctor 
+struct DriverModelGetvalEventHandler : DriverModelGetvalFunctor 
 {};
 
 template<DriverModelDataKind kind>
-struct DriverModelSetValueEventHandler : DriverModelSetValueFunctor
+struct DriverModelSetvalEventHandler : DriverModelSetvalFunctor
 {};
 
 template<DriverModelCommandKind kind>
-struct DriverModelCommandEventHandler : DriverModelCommandFunctor
+struct DriverModelRuncmdEventHandler : DriverModelRuncmdFunctor
 {};
 
 struct DriverModelEventRegistry
 {
-    using SetValueFuncArray = 
-        std::array<std::unique_ptr<DriverModelSetValueFunctor>, 1024>;
+    using SetvalFunctors
+        = std::array<std::unique_ptr<DriverModelSetvalFunctor>, 1024>;
     
-    using GetValueFuncArray = 
-        std::array<std::unique_ptr<DriverModelGetValueFunctor>, 1024>;
+    using GetvalFunctors 
+        = std::array<std::unique_ptr<DriverModelGetvalFunctor>, 1024>;
     
-    using CommandFuncArray = 
-        std::array<std::unique_ptr<DriverModelCommandFunctor>, 8>;
+    using RuncmdFunctors 
+        = std::array<std::unique_ptr<DriverModelRuncmdFunctor>, 8>;
 
     static void init() {
-        init_set_value_func_array<0, DriverModelDataKind_meta.members.size()>();
-        init_get_value_func_array<0, DriverModelDataKind_meta.members.size()>();
-        init_command_func_array<0, DriverModelCommandKind_meta.members.size()>();
+        init_setval_handlers<
+            0, 
+            DriverModelDataKind_meta.members.size()
+        >();
+        
+        init_getval_handlers<
+            0, 
+            DriverModelDataKind_meta.members.size()
+        >();
+        
+        init_runcmd_handlers<
+            0, 
+            DriverModelCommandKind_meta.members.size()
+        >();
     }
 
     static void set_model(std::shared_ptr<DriverModel> a_model)
     {
-        for (int i = 0; i < set_value_func_array.size(); i++) {
-            if (set_value_func_array[i]) {
-                set_value_func_array[i]->set_model(a_model);
+        for (int i = 0; i < setval_handlers.size(); i++) {
+            if (setval_handlers[i]) {
+                setval_handlers[i]->set_model(a_model);
             }
         }
 
-        for (int i = 0; i < get_value_func_array.size(); i++) {
-            if (get_value_func_array[i]) {
-                get_value_func_array[i]->set_model(a_model);
+        for (int i = 0; i < getval_handlers.size(); i++) {
+            if (getval_handlers[i]) {
+                getval_handlers[i]->set_model(a_model);
             }
         }
 
-        for (int i = 0; i < command_func_array.size(); i++) {
-            if (command_func_array[i]) {
-                command_func_array[i]->set_model(a_model);
+        for (int i = 0; i < runcmd_handlers.size(); i++) {
+            if (runcmd_handlers[i]) {
+                runcmd_handlers[i]->set_model(a_model);
             }
         }
     }
        
-    static SetValueFuncArray set_value_func_array;
-    static GetValueFuncArray get_value_func_array;
-    static CommandFuncArray  command_func_array;
+    static GetvalFunctors getval_handlers;
+    static RuncmdFunctors runcmd_handlers;
+    static SetvalFunctors setval_handlers;
 private:
     template<int I, int N>
-    static void init_set_value_func_array()
+    static void init_setval_handlers()
     {
         if constexpr (I < N) {
-            set_value_func_array[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
-                std::make_unique<DriverModelSetValueEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
-            init_set_value_func_array<I+1, N>();
+            setval_handlers[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelSetvalEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
+            init_setval_handlers<I+1, N>();
         }
     }
 
     template<int I, int N>
-    static void init_get_value_func_array()
+    static void init_getval_handlers()
     {
         if constexpr (I < N) {
-            get_value_func_array[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
-                std::make_unique<DriverModelGetValueEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
-            init_get_value_func_array<I+1, N>();
+            getval_handlers[static_cast<int>(DriverModelDataKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelGetvalEventHandler<DriverModelDataKind_meta.members.at(I).value>>();
+            init_getval_handlers<I+1, N>();
         }
     }
 
     template<int I, int N>
-    static void init_command_func_array()
+    static void init_runcmd_handlers()
     {
         if constexpr (I < N) {
-            command_func_array[static_cast<int>(DriverModelCommandKind_meta.members.at(I).value)] =
-                std::make_unique<DriverModelCommandEventHandler<DriverModelCommandKind_meta.members.at(I).value>>();
-            init_command_func_array<I+1, N>();
+            runcmd_handlers[static_cast<int>(DriverModelCommandKind_meta.members.at(I).value)] =
+                std::make_unique<DriverModelRuncmdEventHandler<DriverModelCommandKind_meta.members.at(I).value>>();
+            init_runcmd_handlers<I+1, N>();
         }
     }
 };
 
-DriverModelEventRegistry::SetValueFuncArray DriverModelEventRegistry::set_value_func_array;
-DriverModelEventRegistry::GetValueFuncArray DriverModelEventRegistry::get_value_func_array;
-DriverModelEventRegistry::CommandFuncArray  DriverModelEventRegistry::command_func_array;
+DriverModelEventRegistry::GetvalFunctors DriverModelEventRegistry::getval_handlers;
+DriverModelEventRegistry::RuncmdFunctors DriverModelEventRegistry::runcmd_handlers;
+DriverModelEventRegistry::SetvalFunctors DriverModelEventRegistry::setval_handlers;
 
-#include "DriverModel.UserEvent.hpp"
+template<>
+struct DriverModelSetvalEventHandler<DriverModelDataKind::DRIVER_DATA_STATUS> : DriverModelSetvalFunctor
+{
+    int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+        return 1;
+    }
+};
+
+template<>
+struct DriverModelSetvalEventHandler<DriverModelDataKind::DRIVER_DATA_TIMESTEP> : DriverModelSetvalFunctor
+{
+    int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+        return 1;
+    }
+};
+
+template<>
+struct DriverModelSetvalEventHandler<DriverModelDataKind::DRIVER_DATA_TIME> : DriverModelSetvalFunctor
+{
+    int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+        return 1;
+    }
+};
 
 #endif
 

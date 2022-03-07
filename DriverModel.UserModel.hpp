@@ -25,6 +25,14 @@ SOFTWARE.
 #ifndef _DRIVERMODEL_USER_MODEL_H
 #define _DRIVERMODEL_USER_MODEL_H
 
+#include <memory>
+#include "DriverModel.Base.hpp"
 
+struct DriverModelFactory
+{
+    static std::shared_ptr<DriverModel> CreateDriverModel() {
+        return { nullptr };
+    }
+};
 
 #endif
