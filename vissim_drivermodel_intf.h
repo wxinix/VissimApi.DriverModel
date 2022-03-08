@@ -22,17 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _DRIVERMODEL_USER_MODEL_H
-#define _DRIVERMODEL_USER_MODEL_H
+#ifndef _DRIVERMODEL_INTF_H
+#define _DRIVERMODEL_INTF_H
 
-#include <memory>
-#include "DriverModel.Base.hpp"
+#ifdef DRIVERMODEL_EXPORTS
+#define DRIVERMODEL_API extern "C" __declspec(dllexport)
+#else
+#define DRIVERMODEL_API extern "C" __declspec(dllimport)
+#endif
 
-struct DriverModelFactory
-{
-    static std::shared_ptr<DriverModel> CreateDriverModel() {
-        return { nullptr };
-    }
-};
+DRIVERMODEL_API int DriverModelSetValue(int type, int index1, int index2, int int_value, double double_value, char* string_value);
+DRIVERMODEL_API int DriverModelSetValue3(int type, int index1, int index2, int index3, int int_value, double double_value, char* string_value);
+DRIVERMODEL_API int DriverModelGetValue(int type, int index1, int index2, int* int_value, double* double_value, char** string_value);
+DRIVERMODEL_API int DriverModelGetValue3(int type, int index1, int index2, int index3, int* int_value, double* double_value, char** string_value);
+DRIVERMODEL_API int DriverModelExecuteCommand(int number);
 
 #endif
+
+

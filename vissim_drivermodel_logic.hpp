@@ -22,12 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _DRIVERMODEL_BASE_MODEL_H
-#define _DRIVERMODEL_BASE_MODEL_H
+#ifndef _DRIVERMODEL_LOGIC_H
+#define _DRIVERMODEL_LOGIC_H
 
-class DriverModel
+#include <memory>
+#include "vissim_drivermodel_base.hpp"
+
+namespace vissim_drivermodel {
+
+struct DriverModelFactory
 {
-
+    static std::shared_ptr<DriverModel> CreateDriverModel() {
+        return { nullptr };
+    }
 };
+
+}
 
 #endif

@@ -12,12 +12,12 @@ From the software engineering perspective, there are some nuances with Vissim's 
 The framework herein provides a different design and implementation in modern C++ - modular, structured, while still computationally efficient (actually, faster). Specifically, this framework features:
 
 - *Separation of Concerns* 
-  - **DriverModel.Intf** is responsible for communicating with the Vissim simulator. It includes DLL export functions with minimal boiler-plate code. This part of code is not supposed to be changed by the user.
-  - **DriverModel.UserModel** is where the user implements customized driver behavior logic. The user should implement the DriverModelFactory accordingly.
-  - **DriverModel.Event** is a type of "glue" code, responsible for "wiring-up" various driver model events. The user is not supposed to change the code in this part.
+  - **intf** is responsible for communicating with the Vissim simulator. It includes DLL export functions with minimal boiler-plate code. This part of code is not supposed to be changed by the user.
+  - **logic** is where the user implements customized driver behavior logic. The user should implement the DriverModelFactory accordingly.
+  - **event** is a type of "glue" code, responsible for "wiring-up" various driver model events. The user is not supposed to change the code in this part.
     - The new event-dispatching mechanism no longer uses "boring" (and slower) switch-case statements. The mechanism now dispatches events to proper event handlers using a faster static table of function pointers.
     - More important, this new mechanism facilitates writing structured, scalable, and maintainable code for sophisticated user-defined logic, thanks to that events are now completely decoupled from user logic.
-  - **DriverModel.Meta**. Low-level C++ meta enum helper class. Somewhat complex but worthwhile and fun to explore. This part of code is not supposed to be changed by the user.
+  - **meta**. Low-level C++ meta enum helper class. Somewhat complex but worthwhile and fun to explore. This part of code is not supposed to be changed by the user.
   
 - *Open for extension, close for modification*
   - Those boring and slower switch-case statements are replaced by an array of function pointers automatically constructed at compile time, which leads to faster event dispatching than the original switch statements. 

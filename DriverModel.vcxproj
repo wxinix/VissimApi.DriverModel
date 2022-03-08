@@ -253,20 +253,20 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DriverModel.Intf.h" />
-    <ClInclude Include="DriverModel.Meta.hpp" />
-    <ClInclude Include="DriverModel.Base.hpp" />
-    <ClInclude Include="DriverModel.UserModel.hpp" />
+    <ClInclude Include="vissim_drivermodel_intf.h" />
+    <ClInclude Include="vissim_drivermodel_meta.hpp" />
+    <ClInclude Include="vissim_drivermodel_base.hpp" />
+    <ClInclude Include="vissim_drivermodel_logic.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="DriverModel.Event.hpp" />
+    <None Include="vissim_drivermodel_event.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DriverModel.rc" />
+    <ResourceCompile Include="vissim_drivermodel.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DriverModel.Intf.cpp" />
+    <ClCompile Include="vissim_drivermodel_intf.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

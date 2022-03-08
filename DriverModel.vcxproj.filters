@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="DriverModel.Intf.h" />
-    <ClInclude Include="DriverModel.Meta.hpp" />
-    <ClInclude Include="DriverModel.Base.hpp" />
-    <ClInclude Include="DriverModel.UserModel.hpp" />
+    <ClInclude Include="vissim_drivermodel_intf.h" />
+    <ClInclude Include="vissim_drivermodel_meta.hpp" />
+    <ClInclude Include="vissim_drivermodel_base.hpp" />
+    <ClInclude Include="vissim_drivermodel_logic.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DriverModel.Intf.cpp" />
+    <ClCompile Include="vissim_drivermodel_intf.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DriverModel.Event.hpp" />
+    <None Include="vissim_drivermodel_event.hpp" />
     <None Include="cpp.hint">
       <Filter>Hint</Filter>
     </None>
@@ -24,7 +24,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DriverModel.rc">
+    <ResourceCompile Include="vissim_drivermodel.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
