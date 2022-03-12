@@ -147,15 +147,15 @@ meta_enum_class(DriverModelCommandKind, int,
 struct DriverModelFunctor
 {
 public:
-    void set_model(std::shared_ptr<DriverModel> a_model) {
-        m_driver_model = a_model;
+    void set_drivermodel(std::shared_ptr<DriverModel> a_model) {
+        m_drivermodel = a_model;
     };
 
-    std::shared_ptr<DriverModel> driver_model() {
-        return m_driver_model;
+    std::shared_ptr<DriverModel> drivermodel() {
+        return m_drivermodel;
     };
 private:
-    std::shared_ptr<DriverModel> m_driver_model{ nullptr };
+    std::shared_ptr<DriverModel> m_drivermodel{ nullptr };
 };
 
 struct DriverModelGetvalFunctor : public DriverModelFunctor
@@ -219,23 +219,23 @@ struct DriverModelEventRegistry
         >();
     }
 
-    static void set_model(std::shared_ptr<DriverModel> a_model)
+    static void set_drivermodel(std::shared_ptr<DriverModel> a_model)
     {
-        for (int i = 0; i < setval_handlers.size(); i++) {
-            if (setval_handlers[i]) {
-                setval_handlers[i]->set_model(a_model);
+        for (const auto & setval_handler : setval_handlers) {
+            if (setval_handler) {
+                setval_handler->set_drivermodel(a_model);
             }
         }
 
-        for (int i = 0; i < getval_handlers.size(); i++) {
-            if (getval_handlers[i]) {
-                getval_handlers[i]->set_model(a_model);
+        for (const auto & getval_handler : getval_handlers) {
+            if (getval_handler) {
+                getval_handler->set_drivermodel(a_model);
             }
         }
 
-        for (int i = 0; i < runcmd_handlers.size(); i++) {
-            if (runcmd_handlers[i]) {
-                runcmd_handlers[i]->set_model(a_model);
+        for (const auto & runcmd_handler : runcmd_handlers) {
+            if (runcmd_handler) {
+                runcmd_handler->set_drivermodel(a_model);
             }
         }
     }
