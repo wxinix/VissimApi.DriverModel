@@ -32,50 +32,50 @@ using namespace vissim_drivermodel;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    switch (ul_reason_for_call) {
+  switch (ul_reason_for_call) {
 
-    case DLL_PROCESS_ATTACH:
-        DriverModelEventRegistry::init();
-        DriverModelEventRegistry::set_drivermodel(DriverModelFactory::CreateDriverModel());
-        break;
+  case DLL_PROCESS_ATTACH:
+    DriverModelEventRegistry::init();
+    DriverModelEventRegistry::set_drivermodel(DriverModelFactory::CreateDriverModel());
+    break;
 
-    case DLL_PROCESS_DETACH:
-        break;
+  case DLL_PROCESS_DETACH:
+    break;
 
-    case DLL_THREAD_ATTACH:
-        break;
+  case DLL_THREAD_ATTACH:
+    break;
 
-    case DLL_THREAD_DETACH:
-        break;
+  case DLL_THREAD_DETACH:
+    break;
 
-    default:
-        break;
-    }
+  default:
+    break;
+  }
 
-    return true;
+  return true;
 }
 
 DRIVERMODEL_API int DriverModelSetValue(int type, int index1, int index2, int int_value, double double_value, char* string_value)
 {
-	return (*(DriverModelEventRegistry::setval_handlers[type]))(index1, index2, -1, int_value, double_value, string_value);
+  return (*(DriverModelEventRegistry::setval_handlers[type]))(index1, index2, -1, int_value, double_value, string_value);
 }
 
 DRIVERMODEL_API int DriverModelSetValue3(int type, int index1, int index2, int index3, int int_value, double double_value, char* string_value)
 {
-    return (*(DriverModelEventRegistry::setval_handlers[type]))(index1, index2, index3, int_value, double_value, string_value);
+  return (*(DriverModelEventRegistry::setval_handlers[type]))(index1, index2, index3, int_value, double_value, string_value);
 }
 
 DRIVERMODEL_API int DriverModelGetValue(int type, int index1, int index2, int* int_value, double* double_value, char** string_value)
 {
-    return (*(DriverModelEventRegistry::getval_handlers[type]))(index1, index2, -1, int_value, double_value, string_value);
+  return (*(DriverModelEventRegistry::getval_handlers[type]))(index1, index2, -1, int_value, double_value, string_value);
 }
 
 DRIVERMODEL_API int DriverModelGetValue3(int type, int index1, int index2, int index3, int* int_value, double* double_value, char** string_value)
 {
-    return (*(DriverModelEventRegistry::getval_handlers[type]))(index1, index2, index3, int_value, double_value, string_value);
+  return (*(DriverModelEventRegistry::getval_handlers[type]))(index1, index2, index3, int_value, double_value, string_value);
 }
 
 DRIVERMODEL_API  int  DriverModelExecuteCommand(int number)
 {
-    return (*(DriverModelEventRegistry::runcmd_handlers[number]))();
+  return (*(DriverModelEventRegistry::runcmd_handlers[number]))();
 }
