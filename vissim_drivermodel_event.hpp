@@ -164,14 +164,32 @@ private:
   std::shared_ptr<DriverModel> m_drivermodel{ nullptr };
 };
 
+struct GetvalFunctorParam {
+  int index1;
+  int index2;
+  int index3;
+  int* int_value;
+  double* double_value;
+  char** string_value;
+};
+
+struct SetvalFunctorParam {
+  int index1;
+  int index2;
+  int index3;
+  int int_value;
+  double double_value;
+  char* string_value;
+};
+
 struct GetvalFunctor : public Functor {
-  virtual int operator()(int index1, int index2, int index3, int* int_value, double* double_value, char** string_value) {
+  virtual int operator()(GetvalFunctorParam a_param) {
     return 0;
   }
 };
 
 struct SetvalFunctor : public Functor {
-  virtual int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) {
+  virtual int operator()(SetvalFunctorParam a_param) {
     return 0;
   }
 };
@@ -270,21 +288,21 @@ EventRegistry::SetvalFunctors EventRegistry::setval_handlers;
 // ----------------------------------------------------------------
 template <>
 struct SetvalEventHandler<DataKind::Status> : SetvalFunctor {
-  int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+  int operator()(SetvalFunctorParam a_param) override {
     return 1;
   }
 };
 
 template <>
 struct SetvalEventHandler<DataKind::Timestep> : SetvalFunctor {
-  int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+  int operator()(SetvalFunctorParam a_param) override {
     return 1;
   }
 };
 
 template <>
 struct SetvalEventHandler<DataKind::Time> : SetvalFunctor {
-  int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
+  int operator()(SetvalFunctorParam a_param) override {
     return 1;
   }
 };
