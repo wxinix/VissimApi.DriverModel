@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __EVENT_H
-#define __EVENT_H
+#ifndef _DRIVERMODEL_EVENT_H
+#define _DRIVERMODEL_EVENT_H
 
 #include <memory>
 
@@ -265,6 +265,9 @@ EventRegistry::GetvalFunctors EventRegistry::getval_handlers;
 EventRegistry::RuncmdFunctors EventRegistry::runcmd_handlers;
 EventRegistry::SetvalFunctors EventRegistry::setval_handlers;
 
+// ----------------------------------------------------------------
+// Specialization of event handers to overwrite the default ones.
+// ----------------------------------------------------------------
 template <>
 struct SetvalEventHandler<DataKind::Status> : SetvalFunctor {
   int operator()(int index1, int index2, int index3, int int_value, double double_value, char* string_value) override {
@@ -285,6 +288,8 @@ struct SetvalEventHandler<DataKind::Time> : SetvalFunctor {
     return 1;
   }
 };
+
+//-----------------------------------------------------------------
 
 }  // namespace vissim_drivermodel
 #endif
