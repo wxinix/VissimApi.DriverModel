@@ -254,7 +254,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="vissim_drivermodel_intf.h" />
-    <ClInclude Include="vissim_drivermodel_meta.hpp" />
     <ClInclude Include="vissim_drivermodel_base.hpp" />
     <ClInclude Include="vissim_drivermodel_logic.hpp" />
   </ItemGroup>

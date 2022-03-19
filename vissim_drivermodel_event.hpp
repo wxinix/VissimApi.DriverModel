@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <memory>
 #include "vissim_drivermodel_base.hpp"
-#include "vissim_drivermodel_meta.hpp"
+#include "meta_enum/include/meta_enum.hpp"
 
 namespace vissim_drivermodel {
 // All enumerator in upper case consistent with Vissim
