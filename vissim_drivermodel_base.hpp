@@ -27,7 +27,8 @@ SOFTWARE.
 
 namespace vissim_drivermodel {
 
-class DriverModel {
+class DriverModel
+{
 
 };
 

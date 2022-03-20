@@ -150,13 +150,16 @@ meta_enum_class(
   MoveDriver = 3
 );
 
-struct Functor {
+struct Functor
+{
 public:
-  void set_drivermodel(std::shared_ptr<DriverModel> a_model) {
+  void set_drivermodel(std::shared_ptr<DriverModel> a_model)
+  {
     m_drivermodel = a_model;
   };
 
-  std::shared_ptr<DriverModel> drivermodel() {
+  std::shared_ptr<DriverModel> drivermodel()
+  {
     return m_drivermodel;
   };
 
@@ -164,7 +167,8 @@ private:
   std::shared_ptr<DriverModel> m_drivermodel{ nullptr };
 };
 
-struct GetvalFunctorParam {
+struct GetvalFunctorParam
+{
   int index1;
   int index2;
   int index3;
@@ -173,7 +177,8 @@ struct GetvalFunctorParam {
   char** string_value;
 };
 
-struct SetvalFunctorParam {
+struct SetvalFunctorParam
+{
   int index1;
   int index2;
   int index3;
@@ -182,39 +187,50 @@ struct SetvalFunctorParam {
   char* string_value;
 };
 
-struct GetvalFunctor : public Functor {
-  virtual int operator()(GetvalFunctorParam a_param) {
+struct GetvalFunctor : public Functor
+{
+  virtual int operator()(GetvalFunctorParam a_param)
+  {
     return 0;
   }
 };
 
-struct SetvalFunctor : public Functor {
-  virtual int operator()(SetvalFunctorParam a_param) {
+struct SetvalFunctor : public Functor
+{
+  virtual int operator()(SetvalFunctorParam a_param)
+  {
     return 0;
   }
 };
 
-struct RuncmdFunctor : public Functor {
-  virtual int operator()() {
+struct RuncmdFunctor : public Functor
+{
+  virtual int operator()()
+  {
     return 1;
   }
 };
 
 template <DataKind kind>
-struct GetvalEventHandler : GetvalFunctor {};
+struct GetvalEventHandler : GetvalFunctor
+{};
 
 template <DataKind kind>
-struct SetvalEventHandler : SetvalFunctor {};
+struct SetvalEventHandler : SetvalFunctor
+{};
 
 template <CommandKind kind>
-struct RuncmdEventHandler : RuncmdFunctor {};
+struct RuncmdEventHandler : RuncmdFunctor
+{};
 
-struct EventRegistry {
+struct EventRegistry
+{
   using SetvalFunctors = std::array<std::unique_ptr<SetvalFunctor>, 0x0400>;
   using GetvalFunctors = std::array<std::unique_ptr<GetvalFunctor>, 0x0400>;
   using RuncmdFunctors = std::array<std::unique_ptr<RuncmdFunctor>, 0x0008>;
 
-  static void init() {
+  static void init()
+  {
     constexpr auto num_data_event = DataKind_meta.members.size();
     init_setval_handlers<num_data_event>();
     init_getval_handlers<num_data_event>();
@@ -223,7 +239,8 @@ struct EventRegistry {
     init_runcmd_handlers<num_cmd_event>();
   }
 
-  static void set_drivermodel(std::shared_ptr<DriverModel> a_model) {
+  static void set_drivermodel(std::shared_ptr<DriverModel> a_model)
+  {
     for (const auto& setval_handler : setval_handlers) {
       if (setval_handler) {
         setval_handler->set_drivermodel(a_model);
@@ -249,7 +266,8 @@ struct EventRegistry {
 
 private:
   template <int N, int I = 0>
-  static void init_setval_handlers() {
+  static void init_setval_handlers()
+  {
     if constexpr (I < N) {
       constexpr auto kind = DataKind_meta.members[I].value;
       constexpr auto index = static_cast<int>(kind);
@@ -259,7 +277,8 @@ private:
   }
 
   template <int N, int I = 0>
-  static void init_getval_handlers() {
+  static void init_getval_handlers()
+  {
     if constexpr (I < N) {
       constexpr auto kind = DataKind_meta.members[I].value;
       constexpr auto index = static_cast<int>(kind);
@@ -269,7 +288,8 @@ private:
   }
 
   template <int N, int I = 0>
-  static void init_runcmd_handlers() {
+  static void init_runcmd_handlers()
+  {
     if constexpr (I < N) {
       constexpr auto kind = CommandKind_meta.members.at(I).value;
       constexpr auto index = static_cast<int>(kind);
@@ -287,22 +307,28 @@ EventRegistry::SetvalFunctors EventRegistry::setval_handlers;
 // Specialization of event handers to overwrite the default ones.
 // ----------------------------------------------------------------
 template <>
-struct SetvalEventHandler<DataKind::Status> : SetvalFunctor {
-  int operator()(SetvalFunctorParam a_param) override {
+struct SetvalEventHandler<DataKind::Status> : SetvalFunctor
+{
+  int operator()(SetvalFunctorParam a_param) override
+  {
     return 1;
   }
 };
 
 template <>
-struct SetvalEventHandler<DataKind::Timestep> : SetvalFunctor {
-  int operator()(SetvalFunctorParam a_param) override {
+struct SetvalEventHandler<DataKind::Timestep> : SetvalFunctor
+{
+  int operator()(SetvalFunctorParam a_param) override
+  {
     return 1;
   }
 };
 
 template <>
-struct SetvalEventHandler<DataKind::Time> : SetvalFunctor {
-  int operator()(SetvalFunctorParam a_param) override {
+struct SetvalEventHandler<DataKind::Time> : SetvalFunctor
+{
+  int operator()(SetvalFunctorParam a_param) override
+  {
     return 1;
   }
 };

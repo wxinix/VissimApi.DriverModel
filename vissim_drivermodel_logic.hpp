@@ -32,7 +32,8 @@ namespace vissim_drivermodel {
 
 struct Factory
 {
-  static std::shared_ptr<DriverModel> CreateDriverModel() {
+  static std::shared_ptr<DriverModel> CreateDriverModel()
+  {
     return { nullptr };
   }
 };
