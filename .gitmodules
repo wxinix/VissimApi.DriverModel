@@ -1,6 +1,3 @@
 [submodule "doctest"]
 	path = doctest
 	url = ../../doctest/doctest
-[submodule "meta_enum"]
-	path = meta_enum
-	url = ../meta_enum
