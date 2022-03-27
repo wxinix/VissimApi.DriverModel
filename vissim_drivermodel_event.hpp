@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <memory>
 
-#include "meta_enum/include/meta_enum.hpp"
+#include "meta_enum.hpp"
 #include "vissim_drivermodel_base.hpp"
 
 namespace vissim_drivermodel {
