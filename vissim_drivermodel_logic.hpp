@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _DRIVERMODEL_LOGIC_H
-#define _DRIVERMODEL_LOGIC_H
+#ifndef DRIVERMODEL_LOGIC_HPP
+#define DRIVERMODEL_LOGIC_HPP
 
 #include <memory>
 #include "vissim_drivermodel_base.hpp"

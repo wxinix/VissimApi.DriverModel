@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="vissim_drivermodel_intf.h" />
+    <ClInclude Include="vissim_drivermodel_dllintf.h" />
     <ClInclude Include="vissim_drivermodel_base.hpp" />
     <ClInclude Include="vissim_drivermodel_logic.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="vissim_drivermodel_intf.cpp" />
+    <ClCompile Include="vissim_drivermodel_dllintf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vissim_drivermodel_event.hpp" />

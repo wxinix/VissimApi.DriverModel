@@ -253,7 +253,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="vissim_drivermodel_intf.h" />
+    <ClInclude Include="vissim_drivermodel_dllintf.h" />
     <ClInclude Include="vissim_drivermodel_base.hpp" />
     <ClInclude Include="vissim_drivermodel_logic.hpp" />
   </ItemGroup>
@@ -265,7 +265,7 @@
     <ResourceCompile Include="vissim_drivermodel.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="vissim_drivermodel_intf.cpp" />
+    <ClCompile Include="vissim_drivermodel_dllintf.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
